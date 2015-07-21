@@ -1,7 +1,7 @@
 {
   "name": "grunt-wp-export-lang",
   "description": "Exports a language file (json) out of your wordpress plugin/theme.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "-",
   "author": {
     "name": "Lukas Klappert",
