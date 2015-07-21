@@ -48,11 +48,14 @@ module.exports = function(grunt) {
                 // __('somestring') || _e('somestring')
                 var fileContent = grunt.file.read(path);
                 var regex = /(?:_e|__)\(\s*("|')(.+)\1\s*,\s*\1(.+)\1\s*\);?/g
+                var matches = [];                
 
                 while (matches = regex.exec(fileContent)) {
-                    // TODO: if get option 'language domain'
-                    if(matches[3] && matches[3] == 'allexis')
+                    // TODO: if get option 'language domain'                    
+                    if(matches[3] && matches[3] == 'allexis'){
                         translations.push({key: matches[2], path: path});
+                    }
+
                 }
 
                 // Plugin description
@@ -73,7 +76,16 @@ module.exports = function(grunt) {
             translationFile[translation.key] = translation.key;
         });
 
-        grunt.file.write('./languages/my-plugin.json',JSON.stringify(translationFile));
+        grunt.log.writeln(translations.length+' translations found.');
+
+        var bool = grunt.file.write('./languages/my-plugin.json',JSON.stringify(translationFile));
+
+        if(bool){
+            // TODO: target directory
+            grunt.log.ok('Language file successfully saved to languages/my-plugin.json');
+        } else {
+            grunt.log.error('There was some error saving your file to languages/my-plugin.json');
+        }
 
     });
 
