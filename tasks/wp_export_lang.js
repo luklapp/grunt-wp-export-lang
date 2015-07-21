@@ -10,41 +10,71 @@
 
 module.exports = function(grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+    grunt.task.registerTask('wp_export_lang', 'Exports a language file (json) out of your wordpress plugin/theme.', function() {
+      
+        var config = grunt.config.get('wp_export_lang');
+        var directories = config['directories'];
+        var files = config['files'];
 
-  grunt.registerMultiTask('wp_export_lang', 'Exports a language file (json) out of your wordpress plugin/theme.', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
+        var filesToSearch = [];
+        var translations = [];
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
+        // directories
+        if(Object.prototype.toString.call(directories) === '[object Array]' && directories.length > 0) {
+
+            directories.forEach(function(dir) {
+
+                grunt.file.recurse(dir, function(abspath,rootdir,subdir,filename){
+                    filesToSearch.push(abspath);
+                });                   
+            });
+
         }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
 
-      // Handle options.
-      src += options.punctuation;
+        // files
+        if(Object.prototype.toString.call(files) === '[object Array]' && files.length > 0) {
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+            files.forEach(function(file) {
+                filesToSearch.push(file);        
+            });
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
+        }
+
+        // read files and search for translations
+        filesToSearch.forEach(function(path){
+
+            try {
+
+                // __('somestring') || _e('somestring')
+                var fileContent = grunt.file.read(path);
+                var regex = /(?:_e|__)\(\s*("|')(.+)\1\s*,\s*\1(.+)\1\s*\);?/g
+
+                while (matches = regex.exec(fileContent)) {
+                    // TODO: if get option 'language domain'
+                    if(matches[3] && matches[3] == 'allexis')
+                        translations.push({key: matches[2], path: path});
+                }
+
+                // Plugin description
+                regex = /(?:Description\: )(.*)/g;
+
+                while (matches = regex.exec(fileContent)) {
+                    translations.push({key: matches[1], path: path});
+                }
+
+            } catch(err) {}           
+
+        });
+
+        // TODO: Create PO translation file?
+        var translationFile = {};
+
+        translations.forEach(function(translation){
+            translationFile[translation.key] = translation.key;
+        });
+
+        grunt.file.write('./languages/my-plugin.json',JSON.stringify(translationFile));
+
     });
-  });
 
 };
