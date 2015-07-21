@@ -10,11 +10,19 @@
 
 module.exports = function(grunt) {
 
+    var minimatch = require("minimatch");
+
     grunt.task.registerTask('wp_export_lang', 'Exports a language file (json) out of your wordpress plugin/theme.', function() {
       
-        var config = grunt.config.get('wp_export_lang');
-        var directories = config['directories'];
-        var files = config['files'];
+        var config = grunt.config.get('wp_export_lang') || {};
+        var directories = config['directories'] || [];
+        var files = config['files'] || [];
+        var ignore = config['ignore'] || ['node_modules/**'];
+
+        // read all directories & files if nothing is specified
+        if(directories.length === 0 && files.length === 0){
+            directories = ['./'];
+        } 
 
         var filesToSearch = [];
         var translations = [];
@@ -39,6 +47,18 @@ module.exports = function(grunt) {
             });
 
         }
+
+        // Filter
+        ignore.forEach(function(ig){
+            
+            filesToSearch.forEach(function(path,idx){
+                if(minimatch(path, ig)){
+                    filesToSearch.splice(idx,1);
+                    return;
+                }
+            });
+
+        });
 
         // read files and search for translations
         filesToSearch.forEach(function(path){
@@ -76,7 +96,7 @@ module.exports = function(grunt) {
             translationFile[translation.key] = translation.key;
         });
 
-        grunt.log.writeln(translations.length+' translations found.');
+        grunt.log.writeln(translations.length+' translations found in '+filesToSearch.length+' files.');
 
         var bool = grunt.file.write('./languages/my-plugin.json',JSON.stringify(translationFile));
 
