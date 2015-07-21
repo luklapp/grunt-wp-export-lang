@@ -1,0 +1,42 @@
+{
+  "name": "grunt-wp-export-lang",
+  "description": "Exports a language file (json) out of your wordpress plugin/theme.",
+  "version": "0.0.1",
+  "homepage": "-",
+  "author": {
+    "name": "Lukas Klappert",
+    "email": "info@dogdesigns.de",
+    "url": "www.dogdesigns.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lukas/grunt-wp-export-lang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lukas/grunt-wp-export-lang/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "-/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
